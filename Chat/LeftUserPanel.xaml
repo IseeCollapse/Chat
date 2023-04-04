@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="chat.LeftUserPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:chat"
+             mc:Ignorable="d" 
+             Height="50" Width="165" Margin="2,2,2,0" MouseDown="UserControl_MouseDown">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Border CornerRadius="5" BorderThickness="1" BorderBrush="gray" 
+                Grid.ColumnSpan="10"/>
+        <Border Height="47" Width="47" BorderBrush="Black" BorderThickness="1" CornerRadius="25">
+                <Ellipse Width="45" Height="45">
+                    <Ellipse.Fill>
+                        <ImageBrush x:Name="UserImage" ImageSource="./res/ProfileImage.png" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+            </Border>
+        <Label Name="ChatUserName" Grid.Column="1" FontWeight="Bold" 
+               FontSize="14" FontFamily="Ariel" VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+        <Label Name="ChatUserId" Grid.Column="1" FontWeight="Bold" 
+               FontSize="14" FontFamily="Ariel" VerticalAlignment="Center"
+               HorizontalAlignment="Center" Visibility="Hidden"/>
+    </Grid>
+</UserControl>
