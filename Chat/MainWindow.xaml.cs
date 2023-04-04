@@ -1,24 +1,29 @@
-﻿using chat.View;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using chat.Model;
+using chat.View;
 using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using System;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
 namespace chat
 {
     public partial class MainWindow : Window
     {
+        TCPClient client;
+        string FriendLogin;
+        string TableName;
+        UserLogic user = new UserLogic();
+
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -26,211 +31,134 @@ namespace chat
             {
                 RememberMeToggleButton.IsChecked = true;
                 LoginTextBox.Text = Settings1.Default.Login;
-                PassMasked.Password = Settings1.Default.Password;
+                LoginPassMasked.Password = Settings1.Default.Password;
             }
         }
 
-        bool passView = false;
-        bool passView1 = false;
-        bool passView2 = false;
-        private void ShowHidePassword_Click(object sender, RoutedEventArgs e)
+
+
+        private void ShowSignInPassword(object sender, RoutedEventArgs e)
         {
-            ShowHidePasswordBox showOrHide = new ShowHidePasswordBox();
-            passView = showOrHide.ShowHidePassword(PassUnmasked, PassMasked, passView);
+            MyAnimation showOrHide = new MyAnimation();
+            showOrHide.ShowHidePassword(PassUnmasked, LoginPassMasked, !SignInTglBtn.IsChecked.Value);
 
         }
-        private void RegShowHidePassword_Click(object sender, RoutedEventArgs e)
+        private void ShowRegisterPassword(object sender, RoutedEventArgs e)
         {
-            ShowHidePasswordBox showOrHide = new ShowHidePasswordBox();
-            passView1 = showOrHide.ShowHidePassword(RegPassUnmasked1, RegPassMasked1, passView1);
+            MyAnimation showOrHide = new MyAnimation();
+            showOrHide.ShowHidePassword(RegPassUnmasked1, RegPassMasked1, !RegisterTglBtn.IsChecked.Value);
         }
-        private void RegShowHidePassword2_Click(object sender, RoutedEventArgs e)
+        private void ShowRegisterPassword2(object sender, RoutedEventArgs e)
         {
-            ShowHidePasswordBox showOrHide = new ShowHidePasswordBox();
-            passView2 = showOrHide.ShowHidePassword(RegPassUnmasked2, RegPassMasked2, passView2);
+            MyAnimation showOrHide = new MyAnimation();
+            showOrHide.ShowHidePassword(RegPassUnmasked2, RegPassMasked2, !RegisterTglBtn2.IsChecked.Value);
         }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
+        private void ShowForgotPassword(object sender, RoutedEventArgs e)
         {
-            TranslateTransform trans = new TranslateTransform();  
-            RegGrid.RenderTransform = trans;
-            DoubleAnimation aninX = new DoubleAnimation(0,this.Width * 2, TimeSpan.FromSeconds(1));
-            trans.BeginAnimation(TranslateTransform.XProperty, aninX);
-
-            TranslateTransform translate2 = new TranslateTransform();
-            AuthGrid.RenderTransform = translate2;
-            DoubleAnimation aninmationX = new DoubleAnimation(this.Width * 2, 0, TimeSpan.FromSeconds(0.5));
-            translate2.BeginAnimation(TranslateTransform.XProperty, aninmationX);
+            MyAnimation showOrHide = new MyAnimation();
+            showOrHide.ShowHidePassword(ForgotUnmaskedPass, ForgotMaskedPass, !ForgotTglBtn.IsChecked.Value);
         }
-
-        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        private void ShowForgotPassword2(object sender, RoutedEventArgs e)
         {
-            TranslateTransform translation = new TranslateTransform();
-            AuthGrid.RenderTransform = translation;
-            DoubleAnimation animationX = new DoubleAnimation(0, this.Width * 2, TimeSpan.FromSeconds(1));
-            translation.BeginAnimation(TranslateTransform.XProperty, animationX);
+            MyAnimation showOrHide = new MyAnimation();
+            showOrHide.ShowHidePassword(ForgotUnmaskedPass2, ForgotMaskedPass2, !ForgotTglBtn2.IsChecked.Value);
+        }
+        
 
-            RegGrid.Visibility= Visibility.Visible;
-            TranslateTransform translation2 = new TranslateTransform();
-            RegGrid.RenderTransform = translation2;
-            DoubleAnimation animationX2 = new DoubleAnimation(this.Width * 2, 0, TimeSpan.FromSeconds(0.5));
-            translation2.BeginAnimation(TranslateTransform.XProperty, animationX2);
+
+        private void OpenRegisterGrid(object sender, RoutedEventArgs e)
+        {
+            MyAnimation swapAnimation = new MyAnimation();
+            swapAnimation.SwapPlaceAnimation(AuthGrid, RegGrid, this.Width);
+        }
+        private void ForgotPassword_Click(object sender, RoutedEventArgs e)
+        {
+            MyAnimation swapAnimation = new MyAnimation();
+            swapAnimation.SwapPlaceAnimation(AuthGrid, ForgotPasswordGrid, this.Width);
+        }
+        private void BackFromRegisterGrid(object sender, RoutedEventArgs e)
+        {
+            MyAnimation swapAnimation = new MyAnimation();
+            swapAnimation.SwapPlaceAnimation(RegGrid, AuthGrid, this.Width);
+        }
+        private void BackFromForgotPasswordGrid(object sender, RoutedEventArgs e)
+        {
+            MyAnimation swapAnimation = new MyAnimation();
+            swapAnimation.SwapPlaceAnimation(ForgotPasswordGrid, AuthGrid, this.Width);
         }
 
+
+
+        private void ChangePassword_click(object sender, RoutedEventArgs e)
+        {
+            if (ForgotMaskedPass.Password == ForgotMaskedPass2.Password)
+            {
+                user.ChangePassword(ForgotLogin.Text, ForgotMail.Text, ForgotMaskedPass.Password);
+            }
+            else
+            {
+                MessageBox.Show("Пароли не совпадают");
+            }
+        }
         private void RegisterUserButton_Click(object sender, RoutedEventArgs e)
         {
-            var conn = GetConnection();
-
-            try
+            if (RegPassMasked1.Password == RegPassMasked2.Password)
             {
-                if (RegPassMasked1.Password == RegPassMasked2.Password)
+                bool regSuccessful;
+                regSuccessful = user.RegisterUser(RegEmail.Text, RegUsername.Text, RegPassMasked1.Password);
+
+                if (regSuccessful)
                 {
-                    conn.Open();
-
-                    bool Flag = false;
-                    string CommandText = "select Email from Users";
-                    MySqlCommand command = new MySqlCommand(CommandText, conn);
-                    MySqlDataReader dataReader = command.ExecuteReader();
-                    while (dataReader.Read())
-                    {
-                        if (RegEmail.Text == dataReader["Email"].ToString())
-                        {
-                            MessageBox.Show("На данную почту уже зарегистрирован аккаунт");
-                            Flag= true;
-                            break;
-                        }
-                    }
-                    dataReader.Close();
-
-                    CommandText = "select Username from Users";
-                    command = new MySqlCommand(CommandText, conn);
-                    MySqlDataReader dataReader2 = command.ExecuteReader();
-                    while (dataReader2.Read())
-                    {
-                        if (RegUsername.Text == dataReader2["Username"].ToString())
-                        {
-                            MessageBox.Show("Пользователь с таким именем уже существует");
-                            Flag = true;
-                            break;
-                        }
-                    }
-                    dataReader2.Close();
-
-                    if (!Flag)
-                    {
-                        CommandText = $"INSERT INTO Users (`Email`, `Username`, `Password`) VALUES ('{RegEmail.Text}','{RegUsername.Text}','{RegPassMasked1.Password}')";
-                        command = new MySqlCommand(CommandText, conn);
-                        command.ExecuteNonQuery();
-                        TranslateTransform trans = new TranslateTransform();
-                        RegGrid.RenderTransform = trans;
-                        DoubleAnimation aninX = new DoubleAnimation(0, this.Width * 2, TimeSpan.FromSeconds(1));
-                        trans.BeginAnimation(TranslateTransform.XProperty, aninX);
-
-                        TranslateTransform translate2 = new TranslateTransform();
-                        AuthGrid.RenderTransform = translate2;
-                        DoubleAnimation aninmationX = new DoubleAnimation(this.Width * 2, 0, TimeSpan.FromSeconds(0.5));
-                        translate2.BeginAnimation(TranslateTransform.XProperty, aninmationX);
-                        MessageBox.Show("Учетная запись успешно создана!");
-                    }
+                    MyAnimation enterAnimation = new MyAnimation();
+                    enterAnimation.SwapPlaceAnimation(RegGrid, AuthGrid, this.Width);
                 }
-                else
-                {
-                    MessageBox.Show("Пароли не совпадают!");
-                }
-                conn.Close();
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("Error" + ex);
+                MessageBox.Show("Пароли не совпадают!");
             }
         }
-
         private void EnterButton_Click(object sender, RoutedEventArgs e)
         {
-            var conn = GetConnection();
+            string username = LoginTextBox.Text;
+            string password = LoginPassMasked.Password;
+            bool rememberMe = RememberMeToggleButton.IsChecked.Value;
 
-            try
+            bool isSignIn = user.SignIn(username, password);
+            if (isSignIn)
             {
-                string loginName = LoginTextBox.Text;
-                string loginPassword = PassMasked.Password;
-                DataTable table = new DataTable();
-                MySqlDataAdapter adapter = new MySqlDataAdapter();
-                conn.Open();
-                MySqlCommand command = new MySqlCommand("SELECT * FROM `Users` WHERE `Username` = @uL AND `Password` = @uP", conn);
-                command.Parameters.Add("@uL", MySqlDbType.VarChar).Value = loginName;
-                command.Parameters.Add("@uP", MySqlDbType.VarChar).Value = loginPassword;
-                adapter.SelectCommand= command;
-                adapter.Fill(table);
-                if (table.Rows.Count > 0)
-                {
-                    Thread thread = new Thread(OpentClient);
-                    thread.Start();
-                    LoginGrid.Visibility = Visibility.Hidden;
-                    CreateUsersPanels();
-                    if (RememberMeToggleButton.IsChecked == true)
-                    {
-                        Settings1.Default.Remember = true;
-                        Settings1.Default.Login = LoginTextBox.Text;
-                        Settings1.Default.Password = PassMasked.Password;
-                    }
-                    else
-                    {
-                        Settings1.Default.Remember = false;
-                        Settings1.Default.Login = "";
-                        Settings1.Default.Password = "";
-                    }
-                    Settings1.Default.Save();
-                }
-                else
-                {
-                    MessageBox.Show("Пользователя с таким именем не существует");
-                }
-                conn.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error" + ex);
+                LoginGrid.Visibility = Visibility.Hidden;
+                user.RememberMe(username, password, rememberMe);
+                user.GetId(username);
+                UserImage.ImageSource = user.GetMyImage(username);
+                CreateUsersPanels(username);
+
+
+
+                Thread thread = new Thread(OpentClient);
+                thread.Start();
             }
         }
-        TCPClient client;
-        public void OpentClient()
+        private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                client = new TCPClient();
-                client.ConnectToServer(LoginTextBox.Text);
-                client.TriggerValueChanged += (obj, ev) => NewMsgTCP(client.TriggerValue);
-            }));
+            Thread socketCliendThread = new Thread(Sending);
+            socketCliendThread.Start();
         }
-        int MyId;
-        public void CreateUsersPanels()
-        {
-            var conn = GetConnection();
 
-            string loginName = LoginTextBox.Text;
-            string loginPassword = PassMasked.Password;
+
+
+        public void CreateUsersPanels(string username)
+        {
+            var conn = user.GetConnection();
             try
             {
                 conn.Open();
-                //MySqlCommand command = new MySqlCommand("SELECT * FROM `Users` WHERE `Username` != @uL AND `Password` != @uP", conn);
-                //command.Parameters.Add("@uL", MySqlDbType.VarChar).Value = loginName;
-                //command.Parameters.Add("@uP", MySqlDbType.VarChar).Value = loginPassword;
                 string CommandText = "select * from Users";
                 MySqlCommand cmd = new MySqlCommand(CommandText, conn);
                 MySqlDataReader dataReader = cmd.ExecuteReader();
-                string[] array = new string[2];
                 while (dataReader.Read())
                 {
-                    if (dataReader["Username"].ToString() == loginName)
-                    {
-                        MyId = Convert.ToInt32(dataReader["id"]);
-                        if (dataReader["Image"].ToString() != "")
-                        {
-                            UserImage.ImageSource = DecodeImage(dataReader["Image"].ToString());
-                        }
-                        
-                    }
-                    else
+                    if (dataReader["Username"].ToString() != username)
                     {
                         LeftUserPanel LUP = new LeftUserPanel();
                         LUP.ChatUserName.Content = dataReader["Username"];
@@ -242,26 +170,23 @@ namespace chat
                             LUP.UserImage.ImageSource = DecodeImage(dataReader["Image"].ToString());
                         }
                     }
-
                 }
                 dataReader.Close();
                 conn.Close();
             }
             catch (Exception ex)
             {
+                conn.Close();
                 MessageBox.Show("Error" + ex);
             }
         }
-        string FriendLogin;
-        string TableName;
-
         public void OpenNewChat(int FriendId, string LoginFriend)
         {
             FriendLogin = LoginFriend;
             ChatStackPanel.Children.Clear();
-            var conn = GetConnection();
+            var conn = user.GetConnection();
 
-            int[] tableNameArray = { MyId, FriendId };
+            int[] tableNameArray = { user.myId, FriendId };
             Array.Sort(tableNameArray);
             TableName = "Chat" + tableNameArray[0].ToString() + "AND" + tableNameArray[1].ToString();
             conn.Open();
@@ -271,7 +196,7 @@ namespace chat
                 MySqlCommand cmd = new MySqlCommand(commandText, conn);
                 cmd.ExecuteNonQuery();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error" + ex);
             }
@@ -282,9 +207,9 @@ namespace chat
 
             sqlite_cmd.CommandText = "SELECT * FROM `" + TableName + "`";
             sqlite_datareader = sqlite_cmd.ExecuteReader();
-            while(sqlite_datareader.Read())
+            while (sqlite_datareader.Read())
             {
-                if (sqlite_datareader["SenderId"].ToString() == MyId.ToString())
+                if (sqlite_datareader["SenderId"].ToString() == user.myId.ToString())
                 {
                     MessageCloud MC = new MessageCloud();
                     MC.HorizontalAlignment = HorizontalAlignment.Right;
@@ -293,7 +218,7 @@ namespace chat
                         MC.ImageMessage.Source = DecodeImage(sqlite_datareader["Message"].ToString());
                         MC.ImageMessage.Visibility = Visibility.Visible;
                     }
-                    else if(sqlite_datareader["MessageType"].ToString() == "Text")
+                    else if (sqlite_datareader["MessageType"].ToString() == "Text")
                     {
                         MC.MessageTextBlock.Text = sqlite_datareader["Message"].ToString();
                     }
@@ -326,40 +251,41 @@ namespace chat
             }
             conn.Close();
         }
-
-        public void NewMsgTCP(string messageText)
+        public void OpentClient()
         {
-
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                string [] msgArray = messageText.Split(new char[] { '#' });
-
-            if (msgArray[0] == FriendLogin)
-            {
-                MessageCloud MC = new MessageCloud();
-                MC.DeleteMsg.Visibility = Visibility.Collapsed;
-                MC.HorizontalAlignment = HorizontalAlignment.Left;
-                MC.MessageTextBlock.Text = msgArray[2];
-                MC.MsgBorder.Background = Brushes.LightGray;
-                MC.MsgCldTImeLabel.HorizontalAlignment = HorizontalAlignment.Right;
-                MC.MsgCldTImeLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
-                ChatStackPanel.Children.Add(MC);
-                ChatScrollViewer.ScrollToBottom();
-            }
+                client = new TCPClient();
+                client.ConnectToServer(LoginTextBox.Text);
+                client.TriggerValueChanged += (obj, ev) => NewMsgTCP(client.TriggerValue);
             }));
-
         }
-
-        private void SendButton_Click(object sender, RoutedEventArgs e)
+        private void NewMsgTCP(string messageText)
         {
-                Thread socketCliendThread = new Thread(Sending);
-                socketCliendThread.Start();
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                string[] msgArray = messageText.Split(new char[] { '#' });
+
+                if (msgArray[0] == FriendLogin)
+                {
+                    MessageCloud MC = new MessageCloud();
+                    MC.DeleteMsg.Visibility = Visibility.Collapsed;
+                    MC.HorizontalAlignment = HorizontalAlignment.Left;
+                    MC.MessageTextBlock.Text = msgArray[2];
+                    MC.MsgBorder.Background = Brushes.LightGray;
+                    MC.MsgCldTImeLabel.HorizontalAlignment = HorizontalAlignment.Right;
+                    MC.MsgCldTImeLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+                    ChatStackPanel.Children.Add(MC);
+                    ChatScrollViewer.ScrollToBottom();
+                }
+            }));
         }
+        
         private void Sending()
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                
+
                 MessageCloud MC = new MessageCloud();
                 MC.HorizontalAlignment = HorizontalAlignment.Right;
                 MC.MessageTextBlock.Text = MessageTextBox.Text;
@@ -369,31 +295,31 @@ namespace chat
                 ChatStackPanel.Children.Add(MC);
                 ChatScrollViewer.ScrollToBottom();
 
-                var conn = GetConnection();
+                var conn = user.GetConnection();
                 conn.Open();
 
-                string CommandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + MyId + "', '" + MessageTextBox.Text + "', 'Text', '" + MC.MsgCldTImeLabel.Content + "')";
+                string CommandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + user.myId + "', '" + MessageTextBox.Text + "', 'Text', '" + MC.MsgCldTImeLabel.Content + "')";
                 MySqlCommand cmd = new MySqlCommand(CommandText, conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
                 client.SentData(MessageTextBox.Text, LoginTextBox.Text, FriendLogin);
+                MessageTextBox.Text = "";
             }));
         }
 
         private void Border_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow(MyId);
+            SettingsWindow sw = new SettingsWindow(user.myId);
             sw.Show();
         }
         private ImageSource DecodeImage(string byteArray)
         {
-            byte[] array = byteArray.Split(';').Select(a => byte.Parse(a)).ToArray();   
+            byte[] array = byteArray.Split(';').Select(a => byte.Parse(a)).ToArray();
             MemoryStream stream = new MemoryStream(array);
             Image image = new Image();
             image.Source = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
             return image.Source;
         }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog OFD = new OpenFileDialog();
@@ -430,24 +356,23 @@ namespace chat
                 ChatStackPanel.Children.Add(MC);
                 ChatScrollViewer.ScrollToBottom();
 
-                var conn = GetConnection();
+                var conn = user.GetConnection();
                 conn.Open();
 
-                string CommandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + MyId + "', '" + sb + "', 'JPG', '" + MC.MsgCldTImeLabel.Content + "')";
+                string CommandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + user.myId + "', '" + sb + "', 'JPG', '" + MC.MsgCldTImeLabel.Content + "')";
 
                 MySqlCommand cmd = new MySqlCommand(CommandText, conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
             }
         }
-
         private void SearchUsers(object sender, RoutedEventArgs e)
         {
             string userName = SearchTextBox.Text;
             try
             {
                 UserCardStackPanel.Children.RemoveRange(2, 100);
-                var conn = GetConnection();
+                var conn = user.GetConnection();
                 conn.Open();
 
                 string CommandText = "SELECT * FROM `Users`";
@@ -472,68 +397,6 @@ namespace chat
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-        }
-        private MySqlConnection GetConnection()
-        {
-            string host = "37.140.192.192";
-            int port = 3306;
-            string database = "u1957149_messagerdb";
-            string username = "u1957149_iseecol";
-            string password = "IseeCollapse090801";
-
-            string connString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User id=" + username + ";password=" + password + ";CharSet=utf8";
-
-            MySqlConnection connection = new MySqlConnection(connString);
-            return connection;
-        }
-        private void BackFromChangePass_Click(object sender, RoutedEventArgs e)
-        {
-            TranslateTransform trans = new TranslateTransform();
-            ForgotPasswordGrid.RenderTransform = trans;
-            DoubleAnimation aninX = new DoubleAnimation(0, this.Width * 2, TimeSpan.FromSeconds(1));
-            trans.BeginAnimation(TranslateTransform.XProperty, aninX);
-
-            AuthGrid.Visibility = Visibility.Visible;
-            TranslateTransform translate2 = new TranslateTransform();
-            AuthGrid.RenderTransform = translate2;
-            DoubleAnimation aninmationX = new DoubleAnimation(this.Width * 2, 0, TimeSpan.FromSeconds(0.5));
-            translate2.BeginAnimation(TranslateTransform.XProperty, aninmationX);
-        }
-        private void ForgotPassword_Click(object sender, RoutedEventArgs e)
-        {
-            TranslateTransform translation = new TranslateTransform();
-            AuthGrid.RenderTransform = translation;
-            DoubleAnimation animationX = new DoubleAnimation(0, this.Width * 2, TimeSpan.FromSeconds(1));
-            translation.BeginAnimation(TranslateTransform.XProperty, animationX);
-
-            ForgotPasswordGrid.Visibility = Visibility.Visible;
-            TranslateTransform translation2 = new TranslateTransform();
-            ForgotPasswordGrid.RenderTransform = translation2;
-            DoubleAnimation animationX2 = new DoubleAnimation(this.Width * 2, 0, TimeSpan.FromSeconds(0.5));
-            translation2.BeginAnimation(TranslateTransform.XProperty, animationX2);
-        }
-
-        private void ChangePassword_click(object sender, RoutedEventArgs e)
-        {
-            var conn = GetConnection();
-            conn.Open();
-
-            if (ForgotMaskedPass.Password == ForgotMaskedPass2.Password)
-            {
-                try
-                {
-                    string CommandText = "Update `Users` set Password = '" + ForgotMaskedPass.Password + "' where Username = '" + ForgotLogin.Text + "' and Email = '" + ForgotMail.Text + "'";
-                    MySqlCommand command = new MySqlCommand(CommandText, conn);
-                    command.ExecuteNonQuery();
-                    MessageBox.Show("Пароль обновлен");
-                }
-                catch (Exception) { MessageBox.Show("Пользователь не найдет"); }
-            }
-            else
-            {
-                MessageBox.Show("Пароли не совпадают");
-            }
-            conn.Close();
         }
     }
 };

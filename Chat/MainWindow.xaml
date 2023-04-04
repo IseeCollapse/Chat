@@ -223,7 +223,7 @@
                     <Image Source="./res/AttachIcon.png"/>
                 </Button>
                 <Button Grid.Column="2" Height="30" Width="95" Margin="2"
-                        HorizontalAlignment="Center" Content="Send" Style="{StaticResource DodgeBlueButton}" Click="SendButton_Click" />
+                        HorizontalAlignment="Center" Content="Отправить" Style="{StaticResource DodgeBlueButton}" Click="SendButton_Click" />
             </Grid>
         </Grid>
         <Grid x:Name="LoginGrid" Grid.ColumnSpan="100"
@@ -237,21 +237,21 @@
                 <Border Background="White" CornerRadius="10,0,0,10"
                         BorderThickness="1" BorderBrush="DodgerBlue"/>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <Label Content="Sign in" FontWeight="Bold" FontSize="20"
+                    <Label Content="Войти" FontWeight="Bold" FontSize="20"
                            FontFamily="Ariel" Margin="30,0,0,0"/>
-                    <Label Content="Username" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Имя пользователя" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14"/>
                     <TextBox x:Name="LoginTextBox" MaxLength="24" FontFamily="Ariel"
                              Margin="35,0,30,0"
                              Style="{StaticResource TextBoxStyle}"/>
-                    <Label Content="Password" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Пароль" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14"/>
                     <Grid Margin="35,0,30,0">
                         <TextBox x:Name="PassUnmasked" IsHitTestVisible="True" FontSize="14"
                                  Foreground="#FF252526" FontFamily="Ariel" Style="{StaticResource TextBoxStyle}"/>
-                        <PasswordBox x:Name="PassMasked" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
-                        <ToggleButton Width="25" Height="25" HorizontalAlignment="Left" 
-                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowHidePassword_Click">
+                        <PasswordBox x:Name="LoginPassMasked" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
+                        <ToggleButton Name="SignInTglBtn" Width="25" Height="25" HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowSignInPassword">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Image>
@@ -275,7 +275,7 @@
                         </ToggleButton>
                     </Grid>
                     <ToggleButton x:Name="RememberMeToggleButton" Height="20" Width="130"
-                                  HorizontalAlignment="Left" Margin="35,10,0,0" Content="Remember me"
+                                  HorizontalAlignment="Left" Margin="35,10,0,0" Content="Запомнить меня"
                                   Foreground="Gray" FontFamily="Ariel">
                         <ToggleButton.Template>
                             <ControlTemplate TargetType="ToggleButton">
@@ -320,43 +320,43 @@
                         </ToggleButton.Template>
                     </ToggleButton>
                     <Border Margin="35,10,30,0" Height="25" Background="Black" CornerRadius="5">
-                        <Button Content="Enter" Style="{StaticResource DodgeBlueButton}" Click="EnterButton_Click" />
+                        <Button Content="Войти" Style="{StaticResource DodgeBlueButton}" Click="EnterButton_Click" />
                     </Border>
                     <StackPanel Orientation="Horizontal" Margin="30,10,30,0" HorizontalAlignment="Center">
-                        <Label Content="New account?" FontWeight="Normal" FontSize="12" 
+                        <Label Content="Новый аккаунт?" FontWeight="Normal" FontSize="12" 
                                FontFamily="Ariel" Foreground="Gray" HorizontalContentAlignment="Left" 
                                Margin="0,1,0,0"/>
-                        <Button Content="Register" Style="{StaticResource NoBackgroundButton}" Click="RegisterButton_Click" />
+                        <Button Content="Зарегистрироваться" Style="{StaticResource NoBackgroundButton}" Click="OpenRegisterGrid" />
                     </StackPanel>
-                    <Button Content="forgot my password" Style="{StaticResource NoBackgroundButton}" Click="ForgotPassword_Click" />
+                    <Button Content="Забыл пароль" Style="{StaticResource NoBackgroundButton}" Click="ForgotPassword_Click" />
                 </StackPanel>
             </Grid>
-            <Grid Visibility="Visible" Name="ForgotPasswordGrid" Grid.Column="1">
+            <Grid Visibility="Collapsed" Name="ForgotPasswordGrid" Grid.Column="1">
                 <Border Background="White" CornerRadius="10,0,0,10" 
                         BorderBrush="DodgerBlue" BorderThickness="1" Grid.RowSpan="10"/>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <Button Style="{StaticResource NoBackgroundButton}" Content="Back" HorizontalAlignment="Right"
-                            Margin="0,0,30,0" Click="BackFromChangePass_Click"/>
-                    <Label Content="Change your password" FontWeight="Bold" FontSize="20"
+                    <Button Style="{StaticResource NoBackgroundButton}" Content="Назад" HorizontalAlignment="Right"
+                            Margin="0,0,30,0" Click="BackFromForgotPasswordGrid"/>
+                    <Label Content="Изменить пароль" FontWeight="Bold" FontSize="20"
                            FontFamily="Ariel" Margin="30,0,0,0"/>
-                    <Label Content="Email" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Почта" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <TextBox Name="ForgotMail" MaxLength="24" FontFamily="Ariel"
                              Margin="35,0,30,0"
                              Style="{StaticResource TextBoxStyle}"/>
-                    <Label Content="Username" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Имя пользователя" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <TextBox Name ="ForgotLogin"  MaxLength="24" FontFamily="Ariel"
                              Margin="35,0,30,0"
                              Style="{StaticResource TextBoxStyle}"/>
-                    <Label Content="Password" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Пароль" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <Grid Margin="35,0,30,0">
-                        <TextBox IsHitTestVisible="True" FontSize="14"
+                        <TextBox Name="ForgotUnmaskedPass" IsHitTestVisible="True" FontSize="14"
                                  Foreground="#FF252526" FontFamily="Ariel" Style="{StaticResource TextBoxStyle}"/>
                         <PasswordBox Name="ForgotMaskedPass" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
-                        <ToggleButton Width="25" Height="25" HorizontalAlignment="Left" 
-                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="RegShowHidePassword_Click">
+                        <ToggleButton Name ="ForgotTglBtn" Width="25" Height="25" HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowForgotPassword" >
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Image>
@@ -379,14 +379,14 @@
                             </ToggleButton.Template>
                         </ToggleButton>
                     </Grid>
-                    <Label Content="Password" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Пароль" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <Grid Margin="35,0,30,0">
-                        <TextBox IsHitTestVisible="True" FontSize="14"
+                        <TextBox Name="ForgotUnmaskedPass2" IsHitTestVisible="True" FontSize="14"
                                  Foreground="#FF252526" FontFamily="Ariel" Style="{StaticResource TextBoxStyle}"/>
                         <PasswordBox Name="ForgotMaskedPass2" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
-                        <ToggleButton Width="25" Height="25" HorizontalAlignment="Left" 
-                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="RegShowHidePassword2_Click">
+                        <ToggleButton Name="ForgotTglBtn2" Width="25" Height="25" HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowForgotPassword2">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Image>
@@ -410,36 +410,36 @@
                         </ToggleButton>
                     </Grid>
                     <Border Margin="35,15,30,0" Height="25" Background="Black" CornerRadius="5">
-                        <Button Content="Change" Style="{StaticResource DodgeBlueButton}" Click="ChangePassword_click" />
+                        <Button Content="Изменить" Style="{StaticResource DodgeBlueButton}" Click="ChangePassword_click" />
                     </Border>
                 </StackPanel>
             </Grid>
-            <Grid Visibility="Hidden" x:Name="RegGrid" Grid.Column="1">
+            <Grid Visibility="Collapsed" x:Name="RegGrid" Grid.Column="1">
                 <Border Background="White" CornerRadius="10,0,0,10" 
                         BorderBrush="DodgerBlue" BorderThickness="1" Grid.RowSpan="10"/>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <Button Style="{StaticResource NoBackgroundButton}" Content="Back" HorizontalAlignment="Right"
-                            Margin="0,0,30,0" Click="BackButton_Click" />
-                    <Label Content="Register" FontWeight="Bold" FontSize="20"
+                    <Button Style="{StaticResource NoBackgroundButton}" Content="Назад" HorizontalAlignment="Right"
+                            Margin="0,0,30,0" Click="BackFromRegisterGrid" />
+                    <Label Content="Регистрация" FontWeight="Bold" FontSize="20"
                            FontFamily="Ariel" Margin="30,0,0,0"/>
-                    <Label Content="Email" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Почта" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <TextBox x:Name="RegEmail" MaxLength="24" FontFamily="Ariel"
                              Margin="35,0,30,0"
                              Style="{StaticResource TextBoxStyle}"/>
-                    <Label Content="Username" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Имя пользователя" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <TextBox x:Name="RegUsername" MaxLength="24" FontFamily="Ariel"
                              Margin="35,0,30,0"
                              Style="{StaticResource TextBoxStyle}"/>
-                    <Label Content="Password" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Пароль" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <Grid Margin="35,0,30,0">
                         <TextBox x:Name="RegPassUnmasked1" IsHitTestVisible="True" FontSize="14"
                                  Foreground="#FF252526" FontFamily="Ariel" Style="{StaticResource TextBoxStyle}"/>
                         <PasswordBox x:Name="RegPassMasked1" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
-                        <ToggleButton Width="25" Height="25" HorizontalAlignment="Left" 
-                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="RegShowHidePassword_Click">
+                        <ToggleButton Name ="RegisterTglBtn" Width="25" Height="25" HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowRegisterPassword">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Image>
@@ -462,14 +462,14 @@
                             </ToggleButton.Template>
                         </ToggleButton>
                     </Grid>
-                    <Label Content="Password" FontFamily="Ariel" Margin="30,0,0,0"
+                    <Label Content="Пароль" FontFamily="Ariel" Margin="30,0,0,0"
                            FontWeight="Normal" FontSize="14" Foreground="Gray"/>
                     <Grid Margin="35,0,30,0">
                         <TextBox x:Name="RegPassUnmasked2" IsHitTestVisible="True" FontSize="14"
                                  Foreground="#FF252526" FontFamily="Ariel" Style="{StaticResource TextBoxStyle}"/>
                         <PasswordBox x:Name="RegPassMasked2" MaxLength="24" Style="{StaticResource PasswordBoxStyle}"/>
-                        <ToggleButton Width="25" Height="25" HorizontalAlignment="Left" 
-                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="RegShowHidePassword2_Click">
+                        <ToggleButton Name="RegisterTglBtn2" Width="25" Height="25" HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center" RenderTransformOrigin="0.508,0.5" Margin="230,0,0,0" Click="ShowRegisterPassword2">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Image>
@@ -493,7 +493,7 @@
                         </ToggleButton>
                     </Grid>
                     <Border Margin="35,10,30,0" Height="25" Background="Black" CornerRadius="5">
-                        <Button Content="Register" Style="{StaticResource DodgeBlueButton}" Click="RegisterUserButton_Click"/>
+                        <Button Content="Зарегистрироваться" Style="{StaticResource DodgeBlueButton}" Click="RegisterUserButton_Click"/>
                     </Border>
                 </StackPanel>
             </Grid>

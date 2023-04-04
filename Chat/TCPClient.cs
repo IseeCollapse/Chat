@@ -87,7 +87,11 @@ namespace chat
         public void SentData(string message, string from, string to)
         {
             byte[] data = Encoding.Unicode.GetBytes(message + "#" + from + "#" + to);
-            socket.Send(data);
+            try
+            {
+                socket.Send(data);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         public void CloseConnection()
