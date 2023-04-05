@@ -15,7 +15,7 @@ namespace chat.Model
     internal class UserLogic
     {
         TCPClient client;
-        public int myId { get; private set; }
+        public int myId { get; set; }
         string FriendLogin;
         string TableName;
 
@@ -105,6 +105,17 @@ namespace chat.Model
             {
                 MessageBox.Show("Данный пользователь не существует");
             }
+            conn.Close();
+        }
+        public void ChangePassword(string newPassword)
+        {
+            var conn = GetConnection();
+            conn.Open();
+            string commandText = "Update `Users` set Password = '" + newPassword + "' where id = '" + myId + "'";
+            MySqlCommand command = new MySqlCommand(commandText, conn);
+            command.ExecuteNonQuery();
+            MessageBox.Show("Пароль обновлен");
+
             conn.Close();
         }
 
@@ -213,6 +224,8 @@ namespace chat.Model
             }
             Settings1.Default.Save();
         }
+
+        
 
         private ImageSource DecodeImage(string byteArray)
         {

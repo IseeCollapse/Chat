@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using chat.Model;
+using chat.View;
+using Microsoft.Win32;
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;
@@ -13,11 +15,14 @@ namespace chat
 {
     public partial class SettingsWindow : Window
     {
-        int myId;
+        UserLogic user = new UserLogic();
+        private string Username { get; set; }
+        private string Email { get; set; }
+        
         public SettingsWindow(int MyId)
         {
             InitializeComponent();
-            myId = MyId;
+            user.myId = MyId;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -46,23 +51,26 @@ namespace chat
                 }
                 sb.Remove(sb.Length - 1, 1);
 
-                string host = "37.140.192.192";
-                int port = 3306;
-                string database = "u1957149_messagerdb";
-                string username = "u1957149_iseecol";
-                string password = "IseeCollapse090801";
-
-                string connString = "Server=" + host + ";Database=" + database + ";port=" + port + ";User id=" + username + ";password=" + password + ";CharSet=utf8";
-
-                MySqlConnection conn = new MySqlConnection(connString);
+                var conn = user.GetConnection();
                 conn.Open();
 
-                string CommandText = "Update `Users` set Image = '" + sb + "' where id = '" + myId + "'";
+                string CommandText = "Update `Users` set Image = '" + sb + "' where id = '" + user.myId + "'";
 
                 MySqlCommand cmd = new MySqlCommand(CommandText, conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
             }
+        }
+
+        private void ChangePassword_Click(object sender, RoutedEventArgs e)
+        {
+            user.ChangePassword(ChangePassMasked.Password);
+        }
+
+        private void ShowSignInPassword(object sender, RoutedEventArgs e)
+        {
+            MyAnimation myAnimation= new MyAnimation();
+            myAnimation.ShowHidePassword(ChangePassUnmasked, ChangePassMasked, !ChangePassTglBtn.IsChecked.Value);
         }
     }
 }
