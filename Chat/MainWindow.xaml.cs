@@ -211,7 +211,7 @@ namespace chat
             {
                 if (sqlite_datareader["SenderId"].ToString() == user.myId.ToString())
                 {
-                    MessageCloud MC = new MessageCloud();
+                    MessageCloud MC = new MessageCloud(TableName, sqlite_datareader["id"].ToString());
                     MC.HorizontalAlignment = HorizontalAlignment.Right;
                     if (sqlite_datareader["MessageType"].ToString() == "JPG")
                     {
@@ -230,8 +230,7 @@ namespace chat
                 }
                 else
                 {
-                    MessageCloud MC = new MessageCloud();
-                    MC.DeleteMsg.Visibility = Visibility.Collapsed;
+                    MessageCloud MC = new MessageCloud(TableName, sqlite_datareader["id"].ToString());
                     MC.HorizontalAlignment = HorizontalAlignment.Left;
                     if (sqlite_datareader["MessageType"].ToString() == "JPG")
                     {
@@ -268,8 +267,7 @@ namespace chat
 
                 if (msgArray[0] == FriendLogin)
                 {
-                    MessageCloud MC = new MessageCloud();
-                    MC.DeleteMsg.Visibility = Visibility.Collapsed;
+                    MessageCloud MC = new MessageCloud(null,null);
                     MC.HorizontalAlignment = HorizontalAlignment.Left;
                     MC.MessageTextBlock.Text = msgArray[2];
                     MC.MsgBorder.Background = Brushes.LightGray;
@@ -286,7 +284,7 @@ namespace chat
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
 
-                MessageCloud MC = new MessageCloud();
+                MessageCloud MC = new MessageCloud(null,null);
                 MC.HorizontalAlignment = HorizontalAlignment.Right;
                 MC.MessageTextBlock.Text = MessageTextBox.Text;
                 MC.MsgBorder.Background = Brushes.LightBlue;
@@ -346,7 +344,7 @@ namespace chat
                 }
                 sb.Remove(sb.Length - 1, 1);
 
-                MessageCloud MC = new MessageCloud();
+                MessageCloud MC = new MessageCloud(null,null);
                 MC.HorizontalAlignment = HorizontalAlignment.Right;
                 MC.ImageMessage.Source = DecodeImage(sb.ToString());
                 MC.ImageMessage.Visibility = Visibility.Visible;

@@ -16,8 +16,7 @@ namespace chat.Model
     {
         TCPClient client;
         public int myId { get; set; }
-        string FriendLogin;
-        string TableName;
+
 
         public MySqlConnection GetConnection()
         {

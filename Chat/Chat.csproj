@@ -19,7 +19,9 @@
 
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.19.0" />
+    <PackageReference Include="InputBoxLibrary.PieroViano" Version="1.0.0.75" />
     <PackageReference Include="MySql.Data" Version="8.0.32" />
+    <PackageReference Include="VIPMessageBox.WPF" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>

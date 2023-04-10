@@ -5,40 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:chat"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="200" MaxWidth="400">
-    <UserControl.Resources>
-        <Style x:Key="NoBackgroundButton" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="DodgerBlue"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontFamily" Value="Ariel"/>
-            <Setter Property="Height" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="0" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#FF1878D4"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
+             d:DesignHeight="50" d:DesignWidth="200" MaxWidth="400" MouseRightButtonDown="OpenContextMenu" >
+
     <Grid Margin="0,5,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
         <Border Name="MsgBorder"  CornerRadius="5" Grid.ColumnSpan="10"/>
         <TextBlock Name="MessageTextBlock" Margin="10,0,10,0" 
                    VerticalAlignment="Center" Grid.Row="0" 
@@ -46,8 +19,11 @@
         <Image Height="300" Width="300" Name="ImageMessage" Visibility="Collapsed"/>
         <Label Name="MsgCldTImeLabel" VerticalAlignment="Bottom" Grid.Row="1" 
                FontSize="10" HorizontalAlignment="Center"/>
-        <Button Name="DeleteMsg" Grid.Column="1" Style="{StaticResource NoBackgroundButton}" Click="DeleteMsg_Click" >
-            <Image Source="./res/DeleteButton.png"/>
-        </Button>
     </Grid>
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Name="DeleteMCG" Header="Удалить" Click="DeleteMsg_Click" Visibility="Hidden"/>
+            <MenuItem Name="EditMSG" Header="Редактировать" Visibility="Hidden" Click="EditMsg_Click" />
+        </ContextMenu>
+    </UserControl.ContextMenu>
 </UserControl>
