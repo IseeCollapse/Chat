@@ -25,7 +25,7 @@ namespace chat
             var conn = GetConnection();
             conn.Open();
 
-            string CommandText = "delete from " + TableName + " where id like " + Id;
+            string CommandText = "delete from " + TableName + " where id ='" + Id + "'";
             MySqlCommand command = new MySqlCommand(CommandText, conn);
             command.ExecuteNonQuery();
             conn.Close();
