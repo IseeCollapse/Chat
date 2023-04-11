@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -291,30 +292,58 @@ namespace chat
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-
-                var conn = user.GetConnection();
-                conn.Open();
-                string commandText = "SELECT id FROM " + TableName + " ORDER BY id DESC LIMIT 1";
-                MySqlCommand cmd = new MySqlCommand(commandText, conn);
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                dataReader.Read();
-                MessageCloud MC = new MessageCloud(TableName, dataReader["id"].ToString());
-                dataReader.Close();
-                MC.HorizontalAlignment = HorizontalAlignment.Right;
-                MC.MessageTextBlock.Text = MessageTextBox.Text;
-                MC.MsgBorder.Background = Brushes.LightBlue;
-                MC.MsgCldTImeLabel.HorizontalAlignment = HorizontalAlignment.Left;
-                MC.MsgCldTImeLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
-                ChatStackPanel.Children.Add(MC);
-                ChatScrollViewer.ScrollToBottom();
-
-
-                commandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + user.myId + "', '" + MessageTextBox.Text + "', 'Text', '" + MC.MsgCldTImeLabel.Content + "')";
-                cmd = new MySqlCommand(commandText, conn);
-                cmd.ExecuteNonQuery();
-                conn.Close();
-                client.SentData(MessageTextBox.Text, LoginTextBox.Text, FriendLogin);
-                MessageTextBox.Text = "";
+                try
+                {
+                    var conn = user.GetConnection();
+                    conn.Open();
+                    string commandText = "SELECT count(*) FROM" + TableName;
+                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
+                    int count = cmd.ExecuteNonQuery();
+                    if(count > 0)
+                    {
+                        commandText = "SELECT id FROM " + TableName + " ORDER BY id DESC LIMIT 1";
+                        cmd = new MySqlCommand(commandText, conn);
+                        MySqlDataReader dataReader = cmd.ExecuteReader();
+                        dataReader.Read();
+                        MessageCloud MC = new MessageCloud(TableName, dataReader["id"].ToString());
+                        dataReader.Close();
+                        MC.HorizontalAlignment = HorizontalAlignment.Right;
+                        MC.MessageTextBlock.Text = MessageTextBox.Text;
+                        MC.MsgBorder.Background = Brushes.LightBlue;
+                        MC.MsgCldTImeLabel.HorizontalAlignment = HorizontalAlignment.Left;
+                        MC.MsgCldTImeLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+                        ChatStackPanel.Children.Add(MC);
+                        ChatScrollViewer.ScrollToBottom();
+                        commandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + user.myId + "', '" + MessageTextBox.Text + "', 'Text', '" + MC.MsgCldTImeLabel.Content + "')";
+                        cmd = new MySqlCommand(commandText, conn);
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                        client.SentData(MessageTextBox.Text, LoginTextBox.Text, FriendLogin);
+                        MessageTextBox.Text = "";
+                    }
+                    else
+                    {
+                        MessageCloud MC = new MessageCloud(TableName, "1");
+                        MC.HorizontalAlignment = HorizontalAlignment.Right;
+                        MC.MessageTextBlock.Text = MessageTextBox.Text;
+                        MC.MsgBorder.Background = Brushes.LightBlue;
+                        MC.MsgCldTImeLabel.HorizontalAlignment = HorizontalAlignment.Left;
+                        MC.MsgCldTImeLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+                        ChatStackPanel.Children.Add(MC);
+                        ChatScrollViewer.ScrollToBottom();
+                        commandText = "INSERT INTO`" + TableName + "` " + "(SenderId, Message, MessageType, Time) values ('" + user.myId + "', '" + MessageTextBox.Text + "', 'Text', '" + MC.MsgCldTImeLabel.Content + "')";
+                        cmd = new MySqlCommand(commandText, conn);
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                        client.SentData(MessageTextBox.Text, LoginTextBox.Text, FriendLogin);
+                        MessageTextBox.Text = "";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error" + ex);
+                }
+                
             }));
         }
 
@@ -364,7 +393,7 @@ namespace chat
                 MySqlDataReader dataReader = cmd.ExecuteReader();
                 dataReader.Read();
                 MessageCloud MC = new MessageCloud(TableName, dataReader["id"].ToString());
-                
+                dataReader.Close();
                 MC.HorizontalAlignment = HorizontalAlignment.Right;
                 MC.ImageMessage.Source = DecodeImage(sb.ToString());
                 MC.ImageMessage.Visibility = Visibility.Visible;
