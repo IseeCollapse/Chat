@@ -38,7 +38,7 @@ namespace chat.Model
             try
             {
                 conn.Open();
-                string commandText = "SELECT * FROM `Users` WHERE `Username` = " + username;
+                string commandText = "SELECT * FROM `Users` WHERE `Username` = '" + username + "'";
                 MySqlCommand command = new MySqlCommand(commandText, conn);
                 MySqlDataReader dataReader = command.ExecuteReader();
                 while (dataReader.Read())
@@ -62,7 +62,7 @@ namespace chat.Model
             try
             {
                 conn.Open();
-                string commandText = "SELECT `Image` FROM `Users` WHERE `Username` = " + username;
+                string commandText = "SELECT `Image` FROM `Users` WHERE `Username` = '" + username + "'";
                 MySqlCommand command = new MySqlCommand(commandText, conn);
                 MySqlDataReader dataReader = command.ExecuteReader();
                 while (dataReader.Read())
